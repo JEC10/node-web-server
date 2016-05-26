@@ -1,7 +1,7 @@
 // EXPRESS SET UP SECTION
 var express = require('express'); // creates express variable to store all code in express library
 var app = express(); // creates an express app and saves it in app variable by calling express function
-var PORT = 3000;  // revised as best practice. All caps var name means variable won't be changed (not sure if it can be changed?)
+var PORT = process.env.PORT || 3000;  // setup for Heroku deployment now
 
 var middleware = require('./middleware');		// in same folder so can filepath it as ./
 
