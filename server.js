@@ -3,7 +3,10 @@ var express = require('express'); // creates express variable to store all code 
 var app = express(); // creates an express app and saves it in app variable by calling express function
 var PORT = 3000;  // revised as best practice. All caps var name means variable won't be changed (not sure if it can be changed?)
 
-// MIDDLEWARE SECTION (INSERTED BEFORE REMAINDER OF EXPRESS SETUP SECTION)
+var middleware = require('./middleware');		// in same folder so can filepath it as ./
+
+// MIDDLEWARE SECTION moved to middleware.js
+// middleware runs before a route is hit
 // order in file is important; must be before the routes or would never run
 // create object called middleware
 // first attribute requires user to be logged in; will be route level middleware
@@ -15,18 +18,12 @@ var PORT = 3000;  // revised as best practice. All caps var name means variable 
 // this is application level middleware. Every route requires authentication so when hit a page in browser in terminal it prints
 // 'private route hit!' each time & then care of next the server allow the page to be rendered.
 
-var middleware = {  													
-	requireAuthentication: function (req, res, next) {	// application level middleware (see below for route level). Runs for every route hit
-		console.log('private route hit!');
-		next();
-	},
-	logger: function (req, res, next) {					// will enable us to inspect requests made to server
-		console.log('Request: ' + new Date().toString() + ' ' + req.method + ' ' + req.originalUrl);						// prints out the request method and exact page requested
-	}
-};
-
 // app.use(middleware.requireAuthentication);	// passes in middleware with app.use
-app.use(middleware.logger);	
+app.use(middleware.logger);						// application level middleware
+
+app.get('/about', middleware.requireAuthentication, function (req, res) {	// route level middleware
+	res.send('About Us');
+});
 
 // best practice version below, using second argument (so terminal screen confirms server is working), and a variable for port so don't need to type twice
 // app.listen(3000); // prior simple version using only one hardwired argument
@@ -46,14 +43,6 @@ app.use(express.static(__dirname + '/public'));
 app.get('/about', function (req, res) {
 	res.send('About Us');
 });
-
-/* VERSION SHOWING ROUTE LEVEL MIDDLEWARE
-
-app.get('/about', middleware.requireAuthentication, function (req, res) {	// add a new argument before the anonymous function
-	res.send('About Us');
-});
-
-*/
 
 // deleted 3 lines below so that root route doesn't display text below. Instead default (index.html) is displayed
 // app.get('/', function (req, res) {
